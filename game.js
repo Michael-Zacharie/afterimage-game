@@ -13,12 +13,12 @@ let group,decor,preview=new THREE.Group(),records=[],photos=[],selected=0,histor
 const pos=new V(0,1.68,3.6),safe=new V(0,1.68,3.6),keys=new Set();let yaw=0,pitch=0,vy=0,grounded=true,level=0,mode='intro',holding=false,roll=0,distance=0,scale=1,drag=false,px=0,py=0,elapsed=0,total=0,noticeEnd=0,maxUnlocked=0;
 const reduceMotion=typeof matchMedia==='function'&&matchMedia('(prefers-reduced-motion: reduce)').matches;
 const levels=[
- {name:'风的庭院',goal:[0,0,-21],platforms:[[0,0,0,12,12],[0,0,-21,9,7]],sky:0xb2c9bd,starter:['bridge'],title:'让照片里的路，接上眼前的空白。',hint:'先到附近发光的相片架拾取照片。C 举起，在前方边缘对齐后 E 放置。',help:'站到前方金色圆环中央，面向出口。C 举起照片，保持默认角度、距离与大小，按 E。'},
- {name:'昨日的庭院',temporal:true,goal:[0,0,-21],platforms:[[0,0,0,12,12],[0,0,-21,9,7]],sky:0xc3c7be,starter:['bridge'],wall:true,title:'把昨日的长桥，带回坍塌的庭院。',hint:'1996 年的旧照片里，桥还完整。让桥面接通废墟中的两盏记忆灯。',help:'拾取左侧旧照片，在前方圆环 C 举起、E 显影。旧桥会连接坍塌的缺口，接通两盏记忆灯后，出口开启。放错可按 Z 取回照片。'},
- {name:'侧着的天空',goal:[0,3,-21],platforms:[[0,0,0,12,12],[0,3,-21,9,7]],sky:0xc4c4d0,starter:['turned'],title:'把倾斜的记忆，转回现实。',hint:'先拾取前方工作台上的相机。再把阶梯照片旋转 90°，也可以用 F 拍摄自己的通路。',help:'前方站位线举起阶梯照片，按 R 一次转 90°，再 E 放置。它会恢复成向上的阶梯。'},
- {name:'停电的暗房',copierBattery:true,battery:[1,0,-1.5],goal:[0,0,-37],platforms:[[0,0,0,12,12],[0,0,-19,8,10],[0,0,-37,9,10]],sky:0xb0c4c7,starter:['bridge'],title:'同一块电池，照亮暗房与出口。',hint:'前方取电池 → E 插入右侧复印机 → E 复印 → G 取回电池。再搭两段桥，把电池送到出口电源座。',help:'本关没有胶卷。拾取长桥照片，去前方金色电池旁按 E；靠近右侧复印机 E 插入，再 E 复印。G 拔出电池后出发。两段桥各消耗一张照片，终点电源座按 E 插入。'},
- {name:'借来的光',goal:[21,3,0],platforms:[[0,0,0,12,12],[21,3,0,8,10]],sky:0xbac8a7,starter:['stairs'],east:true,battery:[18,3,1.2],title:'把一束光，带到它该去的地方。',hint:'出口在右侧高处。先搭阶梯，再取电池，带到电缆连接的电源座按 E 插入。',help:'走到右侧金色圆环，面向右侧出口。C 举起阶梯、E 放置。上去后 C 放下照片，靠近电池按 E。'},
- {name:'拼接天空',goal:[21,3,-19],platforms:[[0,0,0,12,12],[0,0,-19,10,10],[21,3,-19,8,10]],sky:0xcdb9a9,starter:['bridge','stairs'],battery:[0,0,-19],title:'两张照片，接通最后一封来信。',hint:'先拾取长桥照片过桥。中间露台上有第二张阶梯照片和电池，再向右登高。',help:'第一张桥连接中间露台；在那里靠近金色电池按 E。再站到露台右侧金色圆环，面向右侧出口，拾取阶梯照片后显影。'}
+ {name:'风的庭院',goal:[0,0,-21],platforms:[[0,0,0,16,12],[0,0,-21,9,7]],sky:0xb2c9bd,starter:['bridge'],title:'让照片里的路，接上眼前的空白。',hint:'先到附近发光的相片架拾取照片。C 举起，在前方边缘对齐后 E 放置。',help:'站到前方金色圆环中央，面向出口。C 举起照片，保持默认角度、距离与大小，按 E。'},
+ {name:'昨日的庭院',temporal:true,goal:[0,0,-21],platforms:[[0,0,0,18,12],[0,0,-21,16,7]],sky:0xc3c7be,starter:['bridge'],wall:true,title:'把昨日的长桥，带回坍塌的庭院。',hint:'先拾取左前方的旧照片。断桥左侧是 01 灯，右侧是 02 灯；让旧桥连接两处灯柱下的记忆点。',help:'拾取左侧旧照片，在前方圆环 C 举起、E 显影。旧桥会连接坍塌的缺口，接通两盏记忆灯后，出口开启。放错可按 Z 取回照片。'},
+ {name:'侧着的天空',goal:[0,3,-21],platforms:[[0,0,0,16,12],[0,3,-21,9,7]],sky:0xc4c4d0,starter:['turned'],title:'把倾斜的记忆，转回现实。',hint:'先拾取前方工作台上的相机。再把阶梯照片旋转 90°，也可以用 F 拍摄自己的通路。',help:'前方站位线举起阶梯照片，按 R 一次转 90°，再 E 放置。它会恢复成向上的阶梯。'},
+ {name:'停电的暗房',copierBattery:true,battery:[1,0,-1.5],goal:[0,0,-37],platforms:[[0,0,0,16,12],[0,0,-19,8,10],[0,0,-37,9,10]],sky:0xb0c4c7,starter:['bridge'],title:'同一块电池，照亮暗房与出口。',hint:'前方取电池 → E 插入右侧复印机 → E 复印 → G 取回电池。再搭两段桥，把电池送到出口电源座。',help:'本关没有胶卷。拾取长桥照片，去前方金色电池旁按 E；靠近右侧复印机 E 插入，再 E 复印。G 拔出电池后出发。两段桥各消耗一张照片，终点电源座按 E 插入。'},
+ {name:'借来的光',goal:[21,3,0],platforms:[[0,0,0,16,12],[21,3,0,8,10]],sky:0xbac8a7,starter:['stairs'],east:true,battery:[18,3,1.2],title:'把一束光，带到它该去的地方。',hint:'出口在右侧高处。先搭阶梯，再取电池，带到电缆连接的电源座按 E 插入。',help:'走到右侧金色圆环，面向右侧出口。C 举起阶梯、E 放置。上去后 C 放下照片，靠近电池按 E。'},
+ {name:'拼接天空',goal:[21,3,-19],platforms:[[0,0,0,16,12],[0,0,-19,10,10],[21,3,-19,8,10]],sky:0xcdb9a9,starter:['bridge','stairs'],battery:[0,0,-19],title:'两张照片，接通最后一封来信。',hint:'先拾取长桥照片过桥。中间露台上有第二张阶梯照片和电池，再向右登高。',help:'第一张桥连接中间露台；在那里靠近金色电池按 E。再站到露台右侧金色圆环，面向右侧出口，拾取阶梯照片后显影。'}
 ];
 
 const themes=[
@@ -86,19 +86,39 @@ function buildChapterProps(){
   for(let i=0;i<3;i++)machinePart(copier,.14,.18,.14,-.4+i*.19,1.05,-.32,mats.rust);
  }
  if(levels[level].temporal){
-  for(const x of [-4.2,4.2]){box(x,1.4,-8.3,2.4,2.8,.85,'rust');box(x,2.86,-8.3,2.6,.12,1,'cream');}
+  for(const x of [-5.6,5.6]){box(x,.9,-8.3,1.8,1.8,.85,'rust');box(x,1.86,-8.3,2,.12,1,'cream');}
   label('1996 / 桥仍完整',-1.8,2.65,1.45,.7);
   label('如今 / 暴风雨后的庭院',0,6,-8.2,1.3);
-  for(const z of [-11,-14]){
-   const p=new THREE.Group();p.position.set(2.8,0,z);decor.add(p);
-   machinePart(p,.45,2,.45,0,-1,0,mats.dark);
-   const lamp=new THREE.Mesh(new THREE.SphereGeometry(.22,12,8),new THREE.MeshBasicMaterial({color:0x5c6067}));lamp.position.y=.4;p.add(lamp);memoryLamps.push(lamp);
-   box(-2.8,-1.7,z,1.1,3.4,1.2,'side');box(2.8,-1.7,z,1.1,3.4,1.2,'side');
+  for(const [index,z] of [-11,-14].entries()){
+   const x=index===0?-2.8:2.8,p=new THREE.Group();p.position.set(x,0,z);decor.add(p);
+   machinePart(p,.7,1.5,.7,0,-.75,0,mats.dark);
+   machinePart(p,.18,2.45,.18,0,1.2,0,mats.gold);
+   machinePart(p,.8,.14,.8,0,2.25,0,mats.dark);
+   const lamp=new THREE.Mesh(new THREE.SphereGeometry(.48,16,12),new THREE.MeshBasicMaterial({color:0x57e7ff}));lamp.position.y=2.85;p.add(lamp);
+   const halo=new THREE.Mesh(new THREE.TorusGeometry(.73,.055,8,36),new THREE.MeshBasicMaterial({color:0x57e7ff}));halo.position.y=2.85;p.add(halo);
+   const beam=new THREE.Mesh(new THREE.CylinderGeometry(.10,.24,3.4,8),new THREE.MeshBasicMaterial({color:0x57e7ff,transparent:true,opacity:.18,depthWrite:false}));beam.position.y=4.8;p.add(beam);
+   const light=new THREE.PointLight(0x57e7ff,2.8,7);light.position.y=2.85;p.add(light);
+   lamp.userData={index,halo,beam,light};memoryLamps.push(lamp);
+   box(x,-1.7,z,1.1,3.4,1.2,'side');
+   const ring=propMesh(new THREE.RingGeometry(.45,.52,32),new THREE.MeshBasicMaterial({color:0x57e7ff,side:THREE.DoubleSide}),0,.035,z);ring.rotation.x=-Math.PI/2;lamp.userData.ring=ring;
+   label('0'+(index+1)+' / 记忆灯',x,3.95,z,.82,'#dcfcff');
   }
-  label('两盏记忆灯 / 让旧桥重新连接',0,2,-13,.95);
+
  }
 }
-function updateMemoryLights(){for(const lamp of memoryLamps)lamp.material.color.set(restored?0xffd382:0x5c6067);}
+function updateMemoryLights(){
+ for(const lamp of memoryLamps){
+  const color=restored?0xffd382:0x57e7ff;
+  lamp.material.color.set(color);
+  for(const key of ['halo','beam','ring'])lamp.userData[key].material.color.set(color);
+  lamp.userData.light.color.set(color);lamp.userData.light.intensity=restored?4:2.8;
+ }
+}
+function animateMemory(now){
+ if(reduceMotion)return;
+ for(const lamp of memoryLamps){const wave=.5+.5*Math.sin(now*.002+lamp.userData.index*1.5);lamp.userData.beam.material.opacity=restored?.24:.10+wave*.12;lamp.userData.halo.rotation.z=now*.00025;}
+}
+
 function updateMemory(photo,inserted){
  if(!levels[level].temporal)return;
  const hasBridge=[-11,-14].every(z=>records.some(r=>{if(!r.solid)return false;const c=S.column(r,0,z);return c&&c.ny>.55&&Math.abs(c.hi)<.45;}));
@@ -109,6 +129,39 @@ function updateMemory(photo,inserted){
 function copyPhoto(){if(levels[level].copierBattery&&batteryDock!=='copier'){notice('复印机没有电。先拾取电池，再靠近按 E 插入。');return;}if(!photos.length){notice('先拾取或拍摄一张照片，再放进复印机。');return;}if(photos.length>=5){notice('最多携带五张照片，先使用一张再复印。');return;}if(performance.now()<copier.userData.until)return;const original=photos[selected];photos.push({...original,name:original.name.replace(' · 复印','')+' · 复印',copy:true,starter:false});selected=photos.length-1;copier.userData.until=performance.now()+800;roll=0;distance=0;scale=1;rebuildPreview();inventory();hud();notice('复印完成：原件保留，新增一张一次性照片。');tone(620,.2);}
 
 function addLandscape(n){if(n===0){const sea=propMesh(new THREE.PlaneGeometry(160,160),new THREE.MeshBasicMaterial({color:0x279bc2,transparent:true,opacity:.48,side:THREE.DoubleSide}),0,-10,-25);sea.rotation.x=-Math.PI/2;}if(n===1){for(let i=0;i<6;i++)propMesh(new THREE.ConeGeometry(8+i%2*3,12+i%3*4,6),mats.rust,-35+i*14,-8,-48);}if(n===2){for(let i=0;i<3;i++){const ring=propMesh(new THREE.TorusGeometry(4+i, .12,8,64),mats.teal,-16,5,-30);ring.rotation.set(i*.6,i*.8,.4);}}if(n===3){for(let i=0;i<65;i++){const a=i*2.399;propMesh(new THREE.SphereGeometry(.08+i%3*.035,5,4),glow,Math.sin(a)*52,8+i%13*2,-30-Math.cos(a)*25);}for(const [x,y,z] of levels[n].platforms){const light=new THREE.PointLight(0x8be9ee,3,16);light.position.set(x,y+3,z);decor.add(light);}}if(n===4){for(let i=0;i<3;i++)tree(-3.8+i*1.5,0,-4.7,.75);for(let i=0;i<4;i++)tree(-12,0,-12-i*4,1.5);}if(n===5){propMesh(new THREE.SphereGeometry(7,32,20),new THREE.MeshBasicMaterial({color:0xffe5b4}),4,11,-63);for(let i=0;i<4;i++){const o=propMesh(new THREE.TorusGeometry(4,.24,8,48),mats.rust,22+i*3,2+i*2,-38);o.rotation.y=.5;}}}
+function planter(x,y,z,color='leaf'){
+ box(x,y+.22,z,.95,.44,.9,'rust');
+ const leaves=propMesh(new THREE.IcosahedronGeometry(.55,1),mats[color],x,y+.75,z);leaves.scale.y=.62;
+}
+function desk(x,z){
+ box(x,.78,z,1.8,.12,.85,'wood');for(const dx of [-.7,.7])box(x+dx,.36,z,.1,.72,.65,'dark');
+ for(let i=0;i<3;i++)box(x-.5+i*.4,.88,z,.3,.08,.48,['cream','rust','teal'][i],false);
+}
+function addWorldDetails(n){
+ const half=levels[n].platforms[0][3]/2;
+ for(const x of [-half+.8,half-.8]){planter(x,0,4.65);planter(x,0,-4.8);}
+ if(n===0){desk(6.3,2.4);bench(6.4,0,4);label('海风茶歇',6.4,2.2,3.8,.7);}
+ if(n===1){
+  desk(-6.6,-.3);label('庭院档案 / 1996—2026',-6.6,2.1,-.3,.8);
+  box(-8.4,1.35,-.6,.18,2.7,3,'wood');
+  for(let i=0;i<3;i++){box(-8.05,.6+i*.68,-.6,.55,.08,2.8,'cream');for(let j=0;j<5;j++)box(-8.02,.85+i*.68,-1.65+j*.46,.34,.42,.27,['rust','teal','gold'][j%3]);}
+  const basin=propMesh(new THREE.CylinderGeometry(1.25,1.4,.4,24),mats.cream,6.4,.2,.7);
+  const water=propMesh(new THREE.CircleGeometry(1.13,32),new THREE.MeshStandardMaterial({color:0x35b7ce,transparent:true,opacity:.72,roughness:.2}),6.4,.41,.7);water.rotation.x=-Math.PI/2;
+  box(6.4,.23,.7,2.5,.46,2.5,'cream',true,false);
+  propMesh(new THREE.CylinderGeometry(.22,.35,.95,16),mats.gold,6.4,.89,.7);
+  bench(6.3,0,3.7);label('雨后的喷泉',6.4,2.15,.7,.65);
+  for(const x of [-6.3,6.3]){marker(x,0,-4.7);box(x,.35,-5.75,3.4,.7,.16,'cream');}
+  label('观景台 / 远处青灯就是记忆点',6.4,1.7,-5.4,.7);
+  for(const x of [-6.3,6.3]){tree(x,0,-22,.8);bench(x,0,-19.2);}
+  arch(-5.7,0,-23);arch(5.7,0,-23);label('庭院的另一页',0,4.5,-24,.9);
+  for(let i=0;i<5;i++){const x=12+i*4,z=-14-i*3;box(x,-3-i*.7,z,3,1,2.2,'side');arch(x,-2.5-i*.7,z);}
+ }else if(n===2){
+  for(let i=0;i<3;i++){box(6.4,.4,-2+i*1.8,1.2,.8,1.2,'side');const sculpture=propMesh(new THREE.TorusGeometry(.45,.13,8,24),mats[i%2?'rust':'gold'],6.4,1.45,-2+i*1.8);sculpture.rotation.y=i*.7;}
+  label('光的展厅',6.4,2.5,1.6,.7);
+ }else if(n===3){desk(-6.2,-.2);label('冲洗记录 / 停电前的最后一卷',-6.2,2,-.2,.75);for(let i=0;i<4;i++){box(-6.8+i*.4,1.75,4.7,.29,.37,.035,'cream',false);box(-6.8+i*.4,1.78,4.73,.23,.23,.025,'teal',false);}}
+ else if(n===4){for(let i=0;i<3;i++)planter(-6.4,0,-2+i*1.8,i%2?'leaf2':'leaf');pergola(-5.6,0,-1.5);label('植物标本园',-6.2,2.6,-1,.75);}
+ else if(n===5){const sundial=propMesh(new THREE.CylinderGeometry(1,1.2,.3,24),mats.cream,6.2,.35,1.7);box(6.2,.5,1.7,2,.4,2,'cream');propMesh(new THREE.ConeGeometry(.14,1.5,5),mats.gold,6.2,1.25,1.7);label('日光档案',6.2,2.5,1.7,.7);}
+}
 function jump(){if(mode==='play'&&!develop&&grounded){vy=5.8;grounded=false;}}
 
 function record(faces,material='stone',solid=true,photoable=true){if(!faces.length)return null;const mesh=new THREE.Mesh(S.geometry(faces),mats[material]);mesh.castShadow=true;mesh.receiveShadow=true;const r={faces,material,solid,photoable,mesh,bounds:S.bounds(faces),planes:S.planes(faces)};records.push(r);group.add(mesh);return r;}
@@ -128,20 +181,20 @@ if(kind!=='bridge')add(x,2.8,-12,4.4,.4,2,'cream');sourceSets[kind]={records:set
 function cleanup(){const meshes=new Set(records.map(r=>r.mesh));for(const h of history)h.records.forEach(r=>meshes.add(r.mesh));meshes.forEach(m=>m.geometry.dispose());if(decor)decor.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material?.map){o.material.map.dispose();o.material.dispose();}});if(group)scene.remove(group);if(decor)scene.remove(decor);clearPreview();records=[];history=[];photos=[];sourceSets={};pickups=[];}
 function clearPreview(){preview.traverse(o=>{if(o.geometry)o.geometry.dispose();});scene.remove(preview);preview=new THREE.Group();scene.add(preview);}
 function buildLevel(n){cleanup();level=n;const d=levels[n];group=new THREE.Group();decor=new THREE.Group();scene.add(group,decor);applyTheme(n);sun.color.set(n===5?0xffcc98:0xffe8be);sun.intensity=n===1?2.2:3;hemi.intensity=n===1?1.7:2;charged=!d.battery&&!d.temporal;carrying=false;batteryDock='ground';restored=false;memoryLamps=[];cameraPickup=null;cameraOwned=n>2;film=n===3?0:4;battery=null;handBattery=null;socket=null;socketPos=null;batteryLabel=null;holding=false;selected=0;roll=0;distance=0;scale=1;develop=null;elapsed=0;
-for(const p of d.platforms)platform(...p);box(0,.8,5.85,11.8,1.6,.22,'cream');box(-5.85,.8,1,.22,1.6,9.5,'cream');if(!d.east)box(5.85,.8,1,.22,1.6,9.5,'cream');box(0,1.64,5.85,12,.12,.3,'rust');tree(-4.6,0,4.2,1);tree(4.7,0,4.4,.9);bench(-3.5,0,3.8);pergola(-3.2,0,2.5);arch(-4.5,0,-4.5,Math.PI/2);tree(-4.5,0,-3,1.1);box(-4.7,.2,-1.0,1.2,.4,1.4,'rust');
+for(const p of d.platforms)platform(...p);const half=d.platforms[0][3]/2;box(0,.8,5.85,half*2-.2,1.6,.22,'cream');box(-half+.15,.8,1,.22,1.6,9.5,'cream');if(!d.east)box(half-.15,.8,1,.22,1.6,9.5,'cream');box(0,1.64,5.85,half*2,.12,.3,'rust');tree(-4.6,0,4.2,1);tree(4.7,0,4.4,.9);bench(-3.5,0,3.8);pergola(-5.2,0,2.5);arch(-4.5,0,-4.5,Math.PI/2);tree(-4.5,0,-3,1.1);box(-4.7,.2,-1.0,1.2,.4,1.4,'rust');
 if(d.wall&&!d.temporal){box(0,2.8,-8.3,12,5.6,.85,'rust');box(0,5.72,-8.3,12.3,.25,1,'cream');for(let i=-5;i<=5;i+=2)box(i,2.8,-7.78,.12,5.6,.14,'cream');label('这不是尽头',0,4.7,-7.6,2);}
 const gp=d.goal;const q=propMesh(new THREE.TorusGeometry(1.27,.13,12,64),mats.gold,gp[0],gp[1]+1.55,gp[2]);if(d.east||n===5)q.rotation.y=Math.PI/2;portal=propMesh(new THREE.CircleGeometry(1.16,64),new THREE.MeshBasicMaterial({color:charged?0xb5f2cf:0x756a56,side:THREE.DoubleSide,transparent:true,opacity:.78}),gp[0],gp[1]+1.55,gp[2]);portal.rotation.copy(q.rotation);box(gp[0],gp[1]+.1,gp[2],2.8,.2,2.8,'dark',false,false);label(charged?'传送 / 下一封来信':d.temporal?'修复旧桥 · 唤醒记忆':'需要一枚电池',gp[0],gp[1]+3.4,gp[2],1.4);tree(gp[0]+3,gp[1],gp[2]+1.3,1.2);bench(gp[0]-2.5,gp[1],gp[2]+1);
 for(let i=1;i<d.platforms.length;i++){const [x,y,z,w,dp]=d.platforms[i];if(w>8)pergola(x-2.5,y,z+dp/2-2);tree(x-w/2+.9,y,z-dp/2+1,.8);}
 if(n===4){for(let i=0;i<4;i++)tree(23,3,-3+i*2,1+i*.12);pergola(21,3,-2);}
 if(n===5){arch(0,0,-21);pergola(22,3,-22);}
 if(n===0){for(let i=0;i<4;i++)box(-3.8+i*.32,.72,3.8,.24,.14,.42,['rust','teal','gold','cream'][i]);label('风会记得你来过',-4,2.5,4.8,.8);}
-if(n===1){for(let i=0;i<4;i++){arch(-9,0,-3-i*5,Math.PI/2);box(-9,-.5,-3-i*5,3,1,5,'side');}artPanel(3,1.9,5.68,0);}
+if(n===1){artPanel(3,1.9,5.68,0);}
 if(n===2){artPanel(-2.5,2.1,5.68,1);artPanel(1,2.1,5.68,0);box(3.9,.85,1.6,1,1.7,1,'side');propMesh(new THREE.IcosahedronGeometry(.62,0),mats.gold,3.9,2.25,1.6);label('换一种方式观看',0,4,5.4,1.2);}
 if(n===3){for(let i=0;i<4;i++){arch(-8,-2,-12-i*5);box(-8,-2.8,-12-i*5,5,1.2,2,'side');}bench(2,0,-18);label('在这里，把风景再用一次',0,3,-20.8,1.2);}
 if(n===4){for(let i=0;i<3;i++){tree(-4.6,0,-2+i*1.8,.72);box(4,0.25,-4+i*1.1,1.3,.5,.85,'rust');}label('把光带回来',20,6,-3,1.3);}
 if(n===5){for(let i=0;i<3;i++){arch(-8,2+i*2,-17-i*5);box(-8,1.1+i*2,-17-i*5,5,.7,2,'side');}label('所有来信，终有回响',23,7,-22,1.6);}
 marker(0,0,-4);if(d.east)marker(4,0,0,-Math.PI/2);if(n===3)marker(0,0,-21);if(n===5)marker(3,0,-19,-Math.PI/2);
-makeSource('bridge',-14);makeSource('stairs',-23);makeExtraSource(['archway','stepping','ramp'][n%3],-34);addLandscape(n);
+makeSource('bridge',-24);makeSource('stairs',-38);makeExtraSource(['archway','stepping','ramp'][n%3],-52);addLandscape(n);addWorldDetails(n);
 for(let i=0;i<20;i++){const a=i*2.399,r=32+i%4*9,x=Math.sin(a)*r,z=Math.cos(a)*r-17;const o=propMesh(new THREE.BoxGeometry(3+i%4,7+i%6*2,3+i%3),mats.side,x,-12-i%3*3,z);if(i%3===0){propMesh(new THREE.BoxGeometry(7,.5,7),mats.cream,x,-5-i%3*3,z);const cloud=propMesh(new THREE.IcosahedronGeometry(5,1),new THREE.MeshBasicMaterial({color:0xf2eddb,transparent:true,opacity:.19,depthWrite:false}),x,-8,z);cloud.scale.set(2,.18,1);}}
 for(let i=0;i<12;i++){const p=propMesh(new THREE.SphereGeometry(.035,5,4),glow,Math.sin(i*3)*8,2+i%5,Math.cos(i*2)*8-5);p.userData.mote=i;}
 if(d.battery){batteryPos=new V(...d.battery);battery=new THREE.Group();decor.add(battery);battery.position.copy(batteryPos);const body=new THREE.Mesh(new THREE.BoxGeometry(.48,.65,.38),mats.gold);body.position.y=.48;battery.add(body);const band=new THREE.Mesh(new THREE.BoxGeometry(.49,.18,.39),glow);band.position.y=.48;battery.add(band);batteryLabel=label('电池 / E 拿起',batteryPos.x,batteryPos.y+1.35,batteryPos.z,1.1);}
@@ -164,7 +217,7 @@ updateMemory(photo,inserted);photos.splice(selected,1);selected=Math.max(0,Math.
 function undo(){if(mode!=='play'||develop)return;if(!history.length){notice('还没有显影记录。');return;}const h=history.pop();records.forEach(r=>group.remove(r.mesh));records=h.records;records.forEach(r=>group.add(r.mesh));pos.copy(h.position);safe.copy(pos);yaw=h.yaw;pitch=h.pitch;vy=0;photos=h.photos;pickups.forEach((p,i)=>{p.taken=h.taken[i];p.group.visible=p.label.visible=!p.taken;});selected=Math.max(0,Math.min(h.selected,photos.length-1));roll=h.roll;distance=h.distance;scale=h.scale;cameraOwned=h.cameraOwned;film=h.film;batteryDock=h.batteryDock;restored=h.restored;if(cameraPickup){cameraPickup.taken=h.cameraTaken;cameraPickup.group.visible=cameraPickup.label.visible=!cameraPickup.taken;}updateMemoryLights();carrying=h.carrying;charged=h.charged;batteryPos=h.batteryPos;updateBatteryVisual();portal.material.color.set(charged?0xb5f2cf:0x756a56);holding=false;rebuildPreview();inventory();hud();notice('空间已回到上一次显影之前，被切掉的建筑也已恢复。');tone(210,.25);}
 function interact(){const d=levels[level];if(cameraPickup&&!cameraPickup.taken&&pos.distanceTo(cameraPickup.position)<1.7){cameraPickup.taken=true;cameraPickup.group.visible=cameraPickup.label.visible=false;cameraOwned=true;film=4;hud();notice('找到相机，装有 4 张胶卷。F 拍摄眼前的建筑，照片仍是一次性使用。');tone(820,.2);return;}const found=pickups.find(p=>!p.taken&&pos.distanceTo(p.position)<1.8);if(found){if(photos.length>=5){const replace=photos.findIndex(p=>!p.starter);if(replace<0){notice('照片收藏已满，请先完成当前关卡。');return;}photos.splice(replace,1);}found.taken=true;found.group.visible=false;found.label.visible=false;photos.push(found.photo);selected=photos.length-1;roll=0;distance=0;scale=1;rebuildPreview();inventory();hud();notice('已拾取「'+found.photo.name+'」。C 举起照片，E 将它放进世界。');tone(740,.15);return;}if(battery&&batteryDock==='ground'&&pos.distanceTo(batteryPos.clone().add(new V(0,1,0)))<2.2){batteryDock='hand';carrying=true;battery.visible=false;hud();updateBatteryVisual();notice('拿起电池。找到电缆连接的独立电源插座，按 E 插入。');tone(770,.12);return;}if(carrying&&nearSocket()){batteryDock='socket';charged=true;carrying=false;portal.material.color.set(0xb5f2cf);hud();updateBatteryVisual();notice('电池已插入电源座，传送门已供电。走进光里。');return;}if(nearCopier()){if(d.copierBattery&&carrying){batteryDock='copier';carrying=false;updateBatteryVisual();hud();notice('复印机已通电。E 复印当前照片；完成后 G 取回电池。');return;}copyPhoto();return;}notice(holding?'E 放置照片':'C 举起照片 · F 拍摄当前画面');}
 function inventory(){$('inventory').replaceChildren();photos.forEach((p,i)=>{const b=document.createElement('button');b.className='thumb'+(i===selected?' active':'');b.setAttribute('aria-label',`选择照片 ${i+1}：${p.name}`);const img=document.createElement('img');img.src=p.image;img.alt=p.name;const text=document.createElement('span');text.textContent=`0${i+1} / ${p.copy?'复印':p.starter?'来信':'现场'}`;b.append(img,text);b.onclick=()=>{selected=i;roll=0;distance=0;scale=1;rebuildPreview();inventory();hud();};$('inventory').appendChild(b);});}
-function hud(){document.documentElement.classList.toggle('projecting',holding);const d=levels[level];$('objective').textContent=photos.length||history.length?d.title:'先找到附近的照片。';$('hint').textContent=photos.length||history.length?d.hint:'左前方的发光相片架上有一张照片。走近后按 E 拾取；空格可以跳跃。';$('photoBox').hidden=!holding;$('photoSettings').hidden=!holding;$('cameraBody').hidden=holding||carrying||!cameraOwned;$('touchF').disabled=!cameraOwned||film<=0;$('cameraStatus').textContent=cameraOwned?(film?'相机 · 胶卷 '+film+' / 4':'相机 · 无胶卷'):level<2?'相机尚未获得 · 第三关解锁':'相机在前方工作台 · E 拾取';$('touchG').hidden=!levels[level].battery;$('batteryStatus').hidden=!carrying;document.querySelector('.reticle').classList.toggle('aiming',!holding);preview.visible=holding;const p=photos[selected];if(p){$('photoImg').src=p.image;$('photoName').textContent=p.name;}$('photoAngle').textContent=`${roll}°`;$('photoBox').style.transform=`translate(-50%,-50%) rotate(${-roll}deg)`;$('transformReadout').textContent=`旋转 ${roll}° / 距离 ${distance.toFixed(1)} m / 比例 ${scale.toFixed(2)}`;$('saveStatus').textContent=`${photos.length} 张照片 · ${history.length} 次显影`;$('reticleLabel').textContent=holding?'ALIGN / PLACE':cameraOwned&&film?'F / 捕捉眼前的空间':'E / 探索与拾取';}
+function hud(){document.documentElement.classList.toggle('projecting',holding);const d=levels[level];$('objective').textContent=d.temporal||photos.length||history.length?d.title:'先找到附近的照片。';$('hint').textContent=d.temporal||photos.length||history.length?d.hint:'左前方的发光相片架上有一张照片。走近后按 E 拾取；空格可以跳跃。';$('photoBox').hidden=!holding;$('photoSettings').hidden=!holding;$('cameraBody').hidden=holding||carrying||!cameraOwned;$('touchF').disabled=!cameraOwned||film<=0;$('cameraStatus').textContent=cameraOwned?(film?'相机 · 胶卷 '+film+' / 4':'相机 · 无胶卷'):level<2?'相机尚未获得 · 第三关解锁':'相机在前方工作台 · E 拾取';$('touchG').hidden=!levels[level].battery;$('batteryStatus').hidden=!carrying;$('memoryStatus').hidden=!d.temporal;$('memoryStatus').textContent=restored?'01 ●   02 ●  记忆已修复 · 出口开启':'01 ◇   02 ◇  断桥两侧的青色灯柱 · 等待旧桥';document.querySelector('.reticle').classList.toggle('aiming',!holding);preview.visible=holding;const p=photos[selected];if(p){$('photoImg').src=p.image;$('photoName').textContent=p.name;}$('photoAngle').textContent=`${roll}°`;$('photoBox').style.transform=`translate(-50%,-50%) rotate(${-roll}deg)`;$('transformReadout').textContent=`旋转 ${roll}° / 距离 ${distance.toFixed(1)} m / 比例 ${scale.toFixed(2)}`;$('saveStatus').textContent=`${photos.length} 张照片 · ${history.length} 次显影`;$('reticleLabel').textContent=holding?'ALIGN / PLACE':cameraOwned&&film?'F / 捕捉眼前的空间':'E / 探索与拾取';}
 function notice(s){$('notice').textContent=s;$('notice').classList.add('show');noticeEnd=performance.now()+4800;}
 function flash(id){$(id).classList.remove('fire');void $(id).offsetWidth;$(id).classList.add('fire');}
 function syncCamera(){camera.position.copy(pos);camera.rotation.set(pitch,yaw,0);camera.updateMatrixWorld(true);}
@@ -184,6 +237,6 @@ addEventListener('keydown',e=>{if(['Space','ArrowUp','ArrowDown','ArrowLeft','Ar
 const canvas=renderer.domElement;canvas.addEventListener('pointerdown',e=>{if(mode!=='play')return;drag=true;px=e.clientX;py=e.clientY;canvas.setPointerCapture(e.pointerId);if(e.pointerType==='mouse'&&!document.pointerLockElement)lock();});canvas.addEventListener('pointermove',e=>{if(mode!=='play')return;if(document.pointerLockElement===canvas){yaw-=e.movementX*.0025;pitch-=e.movementY*.0025;}else if(e.pointerType!=='touch'){yaw-=(Number.isFinite(e.movementX)?e.movementX:e.clientX-px)*.0025;pitch-=(Number.isFinite(e.movementY)?e.movementY:e.clientY-py)*.0025;}else if(drag){yaw-=(e.clientX-px)*.004;pitch-=(e.clientY-py)*.004;}pitch=Math.max(-1.25,Math.min(1.25,pitch));px=e.clientX;py=e.clientY;});canvas.addEventListener('pointerup',()=>drag=false);canvas.addEventListener('pointercancel',()=>drag=false);canvas.addEventListener('contextmenu',e=>e.preventDefault());addEventListener('wheel',e=>{if(mode==='play'&&holding){e.preventDefault();distance=Math.max(-1,Math.min(7,distance+Math.sign(e.deltaY)*.3));hud();}},{passive:false});
 $('start').onclick=()=>start(0);$('continue').onclick=()=>start(maxUnlocked);$('pauseBtn').onclick=()=>setMode(mode==='pause'?'play':'pause');$('resume').onclick=()=>{setMode('play');lock();};$('next').onclick=()=>{buildLevel((level+1)%6);setMode('play');lock();save();};$('placeButton').onclick=deploy;$('helpBtn').onclick=()=>notice(levels[level].help);for(const [id,fn] of Object.entries({touchG:retrieveBattery,touchF:capture,touchC:toggle,touchR:()=>rotate(1),touchE:deploy,touchX:cycle,touchZ:undo,touchJump:jump}))$(id).onclick=fn;document.querySelectorAll('[data-move]').forEach(b=>{b.onpointerdown=e=>{e.preventDefault();keys.add(b.dataset.move);b.setPointerCapture(e.pointerId);};b.onpointerup=b.onpointercancel=()=>keys.delete(b.dataset.move);});
 function resize(){renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();const h=Math.min(innerHeight*Math.tan(24*Math.PI/180)/Math.tan(32.5*Math.PI/180),innerWidth*.72/1.4),w=h*1.4;document.documentElement.style.setProperty('--frameW',`${w}px`);document.documentElement.style.setProperty('--frameH',`${h}px`);}addEventListener('resize',resize);
-try{const saved=JSON.parse(localStorage.getItem('afterimage-v2'));if(saved)maxUnlocked=Math.min(5,Math.max(0,Number(saved.unlocked)||0));}catch{}$('continue').hidden=maxUnlocked===0;buildLevel(0);chapters();setMode('intro');let last=performance.now();function frame(now){requestAnimationFrame(frame);const dt=Math.min((now-last)/1000,.04);last=now;if(mode==='play'){elapsed+=dt;if(develop){develop.time+=dt;const t=reduceMotion?1:Math.min(1,develop.time/.65),e=1-Math.pow(1-t,3);for(const a of develop.animations){const attr=a.r.mesh.geometry.attributes.position;for(let i=0;i<a.full.length;i++)attr.array[i]=a.flat[i]+(a.full[i]-a.flat[i])*e;attr.needsUpdate=true;}if(t===1){for(const a of develop.animations){a.r.mesh.geometry.computeVertexNormals();a.r.mesh.geometry.computeBoundingSphere();}develop=null;}}else walk(dt);updatePickupPrompt(now);if(holding){preview.matrix.copy(pose());preview.visible=true;}}else if(mode==='intro'){camera.position.set(15,9,15);camera.lookAt(-2,.3,-6);}updateBatteryVisual();if(copier)copier.userData.paper.position.z=.45+Math.max(0,(copier.userData.until-now)/800)*.25;if(portal&&!reduceMotion)portal.material.opacity=.7+Math.sin(now*.0018)*.08;if(!reduceMotion)for(const o of decor.children)if(o.userData.mote!==undefined)o.position.y+=Math.sin(now*.0008+o.userData.mote)*dt*.05;if(now>noticeEnd)$('notice').classList.remove('show');renderer.render(scene,camera);}requestAnimationFrame(frame);
-window.afterimage={getState:()=>({version:5,cameraOwned,film,batteryDock,restored,cameraPickup:cameraPickup?{taken:cameraPickup.taken,position:cameraPickup.position.toArray()}:null,handBatteryVisible:!!handBattery?.visible,socketPosition:socketPos?.toArray(),copierPosition:copier?.position.toArray(),level,mode,holding,roll,distance,scale,photos:photos.map(p=>({name:p.name,parts:p.items.length})),selected,history:history.length,solids:records.length,position:pos.toArray(),yaw,pitch,carrying,charged,developing:!!develop,grounded,vy,pickups:pickups.map(p=>({name:p.photo.name,taken:p.taken,position:p.position.toArray(),required:p.required})),theme:themes[level].name}),snapshot:()=>renderer.domElement.toDataURL('image/png')};
+try{const saved=JSON.parse(localStorage.getItem('afterimage-v2'));if(saved)maxUnlocked=Math.min(5,Math.max(0,Number(saved.unlocked)||0));}catch{}$('continue').hidden=maxUnlocked===0;buildLevel(0);chapters();setMode('intro');let last=performance.now();function frame(now){requestAnimationFrame(frame);const dt=Math.min((now-last)/1000,.04);last=now;if(mode==='play'){elapsed+=dt;if(develop){develop.time+=dt;const t=reduceMotion?1:Math.min(1,develop.time/.65),e=1-Math.pow(1-t,3);for(const a of develop.animations){const attr=a.r.mesh.geometry.attributes.position;for(let i=0;i<a.full.length;i++)attr.array[i]=a.flat[i]+(a.full[i]-a.flat[i])*e;attr.needsUpdate=true;}if(t===1){for(const a of develop.animations){a.r.mesh.geometry.computeVertexNormals();a.r.mesh.geometry.computeBoundingSphere();}develop=null;}}else walk(dt);updatePickupPrompt(now);animateMemory(now);if(holding){preview.matrix.copy(pose());preview.visible=true;}}else if(mode==='intro'){camera.position.set(15,9,15);camera.lookAt(-2,.3,-6);}updateBatteryVisual();if(copier)copier.userData.paper.position.z=.45+Math.max(0,(copier.userData.until-now)/800)*.25;if(portal&&!reduceMotion)portal.material.opacity=.7+Math.sin(now*.0018)*.08;if(!reduceMotion)for(const o of decor.children)if(o.userData.mote!==undefined)o.position.y+=Math.sin(now*.0008+o.userData.mote)*dt*.05;if(now>noticeEnd)$('notice').classList.remove('show');renderer.render(scene,camera);}requestAnimationFrame(frame);
+window.afterimage={getState:()=>({version:6,memoryLamps:memoryLamps.map(l=>({position:l.getWorldPosition(new V()).toArray(),color:l.material.color.getHex()})),mapPlatforms:levels[level].platforms,cameraOwned,film,batteryDock,restored,cameraPickup:cameraPickup?{taken:cameraPickup.taken,position:cameraPickup.position.toArray()}:null,handBatteryVisible:!!handBattery?.visible,socketPosition:socketPos?.toArray(),copierPosition:copier?.position.toArray(),level,mode,holding,roll,distance,scale,photos:photos.map(p=>({name:p.name,parts:p.items.length})),selected,history:history.length,solids:records.length,position:pos.toArray(),yaw,pitch,carrying,charged,developing:!!develop,grounded,vy,pickups:pickups.map(p=>({name:p.photo.name,taken:p.taken,position:p.position.toArray(),required:p.required})),theme:themes[level].name}),snapshot:()=>renderer.domElement.toDataURL('image/png')};
 })();
