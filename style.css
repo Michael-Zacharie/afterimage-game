@@ -2,3 +2,5 @@
 .projecting .mission{opacity:.18}.projecting .mission:hover{opacity:1}
 
 .playing #world canvas{cursor:none}#interactPrompt{position:absolute;left:50%;top:58%;transform:translateX(-50%);padding:12px 23px;border:1px solid #ffe1a3;background:#203e37ed;color:#fff0c8;font-size:13px;z-index:7;pointer-events:none;border-radius:3px}.bottom{padding:12px}#controls{font-size:9px;word-spacing:1px}kbd{margin-left:6px}@media(max-width:760px){#interactPrompt{font-size:10px;width:max-content;max-width:90%;top:53%}}
+
+#cameraStatus{position:fixed;right:32px;top:100px;color:#fff3cf;background:#203e42cc;padding:9px 14px;border:1px solid #ffffff30;border-radius:4px;font-size:12px;pointer-events:none}button:disabled{opacity:.4;cursor:not-allowed}@media(max-width:700px){#cameraStatus{top:78px;right:15px;font-size:10px;max-width:180px}}
