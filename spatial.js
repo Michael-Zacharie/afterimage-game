@@ -1,0 +1,18 @@
+'use strict';
+// Convex solids remain closed through capture, placement and subtraction.
+((root)=>{
+const V=THREE.Vector3, EPS=1e-5;
+function normal(face){return new V().subVectors(face[1],face[0]).cross(new V().subVectors(face[2],face[0])).normalize();}
+function box(x,y,z,w,h,d){const p=[[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]].map(a=>new V(x+a[0]*w/2,y+a[1]*h/2,z+a[2]*d/2));return [[0,3,2,1],[4,5,6,7],[0,4,7,3],[1,2,6,5],[0,1,5,4],[3,7,6,2]].map(f=>f.map(i=>p[i].clone()));}
+function clean(points){return points.filter((p,i)=>p.distanceToSquared(points[(i+1)%points.length])>EPS*EPS);}
+function clip(faces,plane){let all=[],cuts=[];for(const face of faces){const out=[];for(let i=0;i<face.length;i++){const a=face[i],b=face[(i+1)%face.length],da=plane.distanceToPoint(a),db=plane.distanceToPoint(b);if(da<=EPS)out.push(a.clone());if((da< -EPS&&db>EPS)||(da>EPS&&db< -EPS)){const p=a.clone().lerp(b,da/(da-db));out.push(p);cuts.push(p);}else if(Math.abs(da)<=EPS)cuts.push(a.clone());}const f=clean(out);if(f.length>=3&&normal(f).lengthSq()>.1)all.push(f);}if(!all.length)return [];const unique=[];for(const p of cuts)if(!unique.some(q=>q.distanceToSquared(p)<EPS*EPS*10))unique.push(p);if(unique.length>=3){const c=unique.reduce((a,p)=>a.add(p),new V()).divideScalar(unique.length),n=plane.normal;const u=new V().crossVectors(n,Math.abs(n.y)<.9?new V(0,1,0):new V(1,0,0)).normalize(),v=new V().crossVectors(n,u);unique.sort((a,b)=>Math.atan2(a.clone().sub(c).dot(v),a.clone().sub(c).dot(u))-Math.atan2(b.clone().sub(c).dot(v),b.clone().sub(c).dot(u)));if(!all.some(f=>f.every(p=>Math.abs(plane.distanceToPoint(p))<EPS)))all.push(unique);}return all;}
+function intersect(faces,planes){let r=faces;for(const p of planes){r=clip(r,p);if(!r.length)break;}return r;}
+function subtract(faces,planes){let inside=faces,result=[];for(const plane of planes){if(!inside.length)break;const ds=inside.flat().map(v=>plane.distanceToPoint(v));if(Math.max(...ds)<=EPS)continue;if(Math.min(...ds)>=-EPS){result.push(inside);inside=[];break;}const out=clip(inside,plane.clone().negate());if(out.length)result.push(out);inside=clip(inside,plane);}return result;}
+function transform(faces,matrix){return faces.map(f=>f.map(p=>p.clone().applyMatrix4(matrix)));}
+function planes(faces){return faces.map(f=>new THREE.Plane().setFromNormalAndCoplanarPoint(normal(f),f[0]));}
+function bounds(faces){return new THREE.Box3().setFromPoints(faces.flat());}
+function geometry(faces){const a=[];for(const f of faces)for(let i=1;i<f.length-1;i++)for(const v of [f[0],f[i],f[i+1]])a.push(v.x,v.y,v.z);const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(a,3));g.computeVertexNormals();return g;}
+function frustum(matrix,fov=48,aspect=1.4,near=.85,far=19){const y=Math.tan(THREE.MathUtils.degToRad(fov/2)),x=y*aspect;return [new THREE.Plane(new V(1,0,x).normalize(),0),new THREE.Plane(new V(-1,0,x).normalize(),0),new THREE.Plane(new V(0,1,y).normalize(),0),new THREE.Plane(new V(0,-1,y).normalize(),0),new THREE.Plane(new V(0,0,1),near),new THREE.Plane(new V(0,0,-1),-far)].map(p=>p.applyMatrix4(matrix));}
+function column(record,x,z){const b=record.bounds;if(x<b.min.x-EPS||x>b.max.x+EPS||z<b.min.z-EPS||z>b.max.z+EPS)return null;let lo=-Infinity,hi=Infinity,ny=1;for(const p of record.planes){const a=p.normal.x*x+p.normal.z*z+p.constant;if(Math.abs(p.normal.y)<EPS){if(a>EPS)return null;}else{const y=-a/p.normal.y;if(p.normal.y>0){if(y<hi){hi=y;ny=p.normal.y;}}else lo=Math.max(lo,y);}}return lo<=hi+EPS?{lo,hi,ny}:null;}
+root.Spatial={box,clip,intersect,subtract,transform,planes,bounds,geometry,frustum,column,normal};
+})(typeof window!=='undefined'?window:globalThis);
